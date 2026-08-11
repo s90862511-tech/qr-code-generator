@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Xnow QR - Générateur de QR Codes</title>
+  <!-- Bibliothèque QRCode.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <style>
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #0a0e1a, #1a1a2e, #16213e);
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 1.5rem;
+      background-image: radial-gradient(circle at 20% 50%, rgba(88, 130, 193, 0.05) 0%, transparent 50%);
+      background: linear-gradient(135deg, #04060a, #3b6cb7);
+      border-color: rgba;
+      box-shadow: 0 4px 15px rgba(88, 130, 193, 0.3);
+    }
+
+    .main-wrapper {
+      max-width: 1200px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    /* === ZONES PUBLICITAIRES === */
+    .ad-container {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 1rem;
+      padding: 0.8rem;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      text-align: center;
+      min-height: 90px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      transition: all 0.3s ease;
+    }
+
+    .ad-container:hover {
+      border-color: rgba(88, 130, 193, 0.3);
+    }
+
+    .ad-label {
+      color: #475569;
+      font-size: 0.6rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 0.4rem;
+      font-weight: 500;
+    }
+
+    .ad-placeholder {
+      color: #64748b;
+      font-size: 0.85rem;
+      padding: 0.5rem;
+      background: rgba(255, 255, 255, 0.02);
+      border-radius: 0.5rem;
+      width: 100%;
+    }
+
+    .ad-placeholder iframe,
+    .ad-placeholder img {
+      max-width: 100%;
+      border-radius: 0.5rem;
+    }
+
+    .ad-top { min-height: 100px; max-height: 120px; }
+    .ad-bottom { min-height: 100px; max-height: 120px; margin-top: 0.5rem; }
+
+    /* === CARTE PRINCIPALE === */
+    .card {
+      background: rgba(255, 255, 255, 0.04);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: 2.5rem;
+      padding: 2.5rem 2rem;
+      max-width: 700px;
+      width: 100%;
+      box-shadow: 0 30px 50px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.06);
+      transition: transform 0.2s ease;
+      border: 1px solid rgba(88, 130, 193, 0.1);
+    }
+
+    /* === EN-TÊTE Xnow QR === */
+    .brand-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.2rem;
+    }
+
+    .brand-icon {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, #5882c1, #3b6cb7);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: white;
+      box-shadow: 0 4px 15px rgba(88, 130, 193, 0.3);
+      flex-shrink: 0;
+    }
+
+    .brand-name {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #f1f5f9;
+      letter-spacing: -0.5px;
+    }
+
+    .brand-name span {
+      background: linear-gradient(135deg, #5882c1, #8ab4f8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .brand-tagline {
+      color: #94a3b8;
+      font-weight: 300;
+      font-size: 0.95rem;
+      margin-left: 0.3rem;
+      border-left: 2px solid rgba(88, 130, 193, 0.4);
+      padding-left: 0.9rem;
+      opacity: 0.8;
+    }
+
+    .subhead {
+      color: #94a3b8;
+      font-weight: 400;
+      font-size: 1rem;
+      margin-bottom: 2rem;
+      margin-top: 0.3rem;
+      padding-left: 0.9rem;
+      border-left: 3px solid #3b82f6;
+    }
+
+    /* === INPUT & BOUTONS === */
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      margin-bottom: 1.8rem;
+    }
+
+    .input-group label {
+      color: #cbd5e1;
+      font-weight: 500;
+      font-size: 0.9rem;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+      opacity: 0.8;
+    }
+
+    .input-row {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    #text-input {
+      flex: 1;
+      min-width: 180px;
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid #334155;
+      border-radius: 1.5rem;
+      padding: 0.9rem 1.5rem;
+      color: #f8fafc;
+      font-size: 1rem;
+      outline: none;
+      transition: all 0.25s ease;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    #text-input:focus {
+      border-color: #5882c1;
+      background: #0f172a;
+      box-shadow: 0 0 0 3px rgba(88, 130, 193, 0.25), inset 0 2px 4px rgba(0,0,0,0.3);
+    }
+
+    #text-input::placeholder {
+      color: #64748b;
+      font-weight: 300;
+    }
+
+    .btn {
+      background: linear-gradient(135deg, #5882c1, #3b6cb7);
+      border: none;
+      border-radius: 2rem;
+      padding: 0 1.8rem;
+      font-weight: 600;
+      color: #f8fafc;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      box-shadow: 0 4px 15px rgba(88, 130, 193, 0.3);
+      white-space: nowrap;
+      height: 3.3rem;
+    }
+
+    .btn:hover {
+      transform: scale(1.03);
+      box-shadow: 0 6px 25px rgba(88, 130, 193, 0.45);
+    }
+
+    .btn:active {
+      transform: scale(0.96);
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 1px solid #475569;
+      box-shadow: none;
+      color: #e2e8f0;
+    }
+
+    .btn-outline:hover {
+      background: rgba(88, 130, 193, 0.1);
+      border-color: #5882c1;
+      box-shadow: 0 0 20px rgba(88, 130, 193, 0.1);
+    }
+
+    .qr-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 2rem;
+      padding: 1.2rem;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 2rem;
+      border: 1px dashed rgba(88, 130, 193, 0.2);
+      transition: all 0.3s ease;
+    }
+
+    .qr-wrapper:hover {
+      border-color: rgba(88, 130, 193, 0.4);
+    }
+
+    .qr-container {
+      background: white;
+      padding: 1.2rem;
+      border-radius: 1.5rem;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+      display: inline-block;
+      line-height: 0;
+      transition: 0.2s;
+      position: relative;
+    }
+
+    /* Petit watermark Xnow QR sur le QR */
+    .qr-container::after {
+      content: 'Xnow QR';
+      position: absolute;
+      bottom: 6px;
+      right: 12px;
+      font-size: 0.5rem;
+      color: rgba(0,0,0,0.15);
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      pointer-events: none;
+    }
+
+    #qrcode {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #qrcode img,
+    #qrcode canvas {
+      display: block !important;
+      max-width: 100%;
+      height: auto;
+      border-radius: 0.5rem;
+    }
+
+    .qr-placeholder {
+      color: #94a3b8;
+      font-size: 0.95rem;
+      padding: 2rem 1rem;
+      text-align: center;
+      font-weight: 300;
+      letter-spacing: 0.3px;
+    }
+
+    .qr-actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.8rem;
+      margin-top: 1.8rem;
+      width: 100%;
+    }
+
+    .qr-actions .btn {
+      flex: 1;
+      min-width: 120px;
+    }
+
+    .footer-credit {
+      margin-top: 2.2rem;
+      text-align: center;
+      color: #475569;
+      font-size: 0.8rem;
+      letter-spacing: 0.3px;
+      border-top: 1px solid rgba(255,255,255,0.05);
+      padding-top: 1.5rem;
+    }
+
+    .footer-credit a {
+      color: #5882c1;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .footer-credit a:hover {
+      color: #8ab4f8;
+      text-decoration: underline;
+    }
+
+    /* === SIDEBAR PUBLICITAIRE === */
+    .ads-sidebar {
+      display: none;
+    }
+
+    @media (min-width: 1024px) {
+      .main-wrapper {
+        flex-direction: row;
+        align-items: flex-start;
+        justify-content: center;
+        gap: 2rem;
+      }
+
+      .card {
+        flex: 1;
+        max-width: 700px;
+      }
+
+      .ads-sidebar {
+        display: block;
+        width: 300px;
+        min-width: 250px;
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 2rem;
+        padding: 1.5rem;
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        position: sticky;
+        top: 1.5rem;
+      }
+
+      .ads-sidebar .ad-label {
+        text-align: center;
+      }
+
+      .ads-sidebar .ad-placeholder {
+        min-height: 400px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 1rem;
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: 1rem;
+        padding: 1.5rem;
+      }
+
+      .ad-top, .ad-bottom {
+        display: none;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .card { padding: 1.8rem 1.2rem; }
+      .brand-name { font-size: 1.6rem; }
+      .brand-icon { width: 40px; height: 40px; font-size: 1.2rem; }
+      .brand-tagline { font-size: 0.8rem; }
+      .input-row { flex-direction: column; }
+      .btn { width: 100%; justify-content: center; }
+      .qr-actions .btn { min-width: unset; }
+      .ad-top, .ad-bottom { min-height: 70px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="main-wrapper">
+    <!-- BANNIÈRE PUB HAUTE -->
+    <div class="ad-container ad-top">
+      <div class="ad-label">✦ Publicité</div>
+      <div class="ad-placeholder">
+        <div style="background: linear-gradient(135deg, #1a1a2e, #2d3748); padding: 0.5rem; border-radius: 0.5rem; color: #94a3b8; font-size: 0.85rem;">
+          📢 <strong>Espace publicitaire</strong> — 728x90 ou responsive
+          <br><span style="font-size: 0.7rem; opacity: 0.6;">(Google AdSense, Media.net, ou autre)</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- CARTE PRINCIPALE -->
+    <div class="card">
+      <!-- EN-TÊTE Xnow QR -->
+      <div class="brand-header">
+        <div class="brand-icon">X</div>
+        <div class="brand-name"><span>Xnow</span> QR</div>
+      </div>
+      <div class="subhead">Générateur instantané · haute qualité</div>
+
+      <!-- Input + bouton -->
+      <div class="input-group">
+        <label for="text-input">Contenu du QR</label>
+        <div class="input-row">
+          <input type="text" id="text-input" placeholder="Texte, URL, email..." value="https://xnow-qr.com">
+          <button class="btn" id="generate-btn">✨ Générer</button>
+        </div>
+      </div>
+
+      <!-- Zone d'affichage du QR -->
+      <div class="qr-wrapper">
+        <div class="qr-container" id="qr-container">
+          <div id="qrcode">
+            <div class="qr-placeholder">⬡ QR code apparaîtra ici</div>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="qr-actions">
+          <button class="btn btn-outline" id="download-btn">⬇ Télécharger</button>
+          <button class="btn btn-outline" id="reset-btn">↺ Effacer</button>
+        </div>
+      </div>
+
+      <div class="footer-credit">
+        <strong>Xnow QR</strong> · propulsé par <a href="#" target="_blank">QRCode.js</a> · 2026
+      </div>
+    </div>
+
+    <!-- SIDEBAR PUB -->
+    <div class="ads-sidebar">
+      <div class="ad-label">✦ Publicité</div>
+      <div class="ad-placeholder">
+        <div style="background: linear-gradient(135deg, #1a1a2e, #2d3748); padding: 1rem; border-radius: 0.5rem; color: #94a3b8; font-size: 0.85rem; min-height: 400px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 1rem;">
+          <span style="font-size: 2rem;">📊</span>
+          <strong>Espace publicitaire</strong>
+          <span style="font-size: 0.75rem; opacity: 0.7;">300x600 ou responsive</span>
+          <span style="font-size: 0.7rem; opacity: 0.5;">(Google AdSense, Media.net, ou autre)</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- BANNIÈRE PUB BASSE -->
+    <div class="ad-container ad-bottom">
+      <div class="ad-label">✦ Publicité</div>
+      <div class="ad-placeholder">
+        <div style="background: linear-gradient(135deg, #1a1a2e, #2d3748); padding: 0.5rem; border-radius: 0.5rem; color: #94a3b8; font-size: 0.85rem;">
+          📢 <strong>Espace publicitaire</strong> — 728x90 ou responsive
+          <br><span style="font-size: 0.7rem; opacity: 0.6;">(Google AdSense, Media.net, ou autre)</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      const textInput = document.getElementById('text-input');
+      const generateBtn = document.getElementById('generate-btn');
+      const qrContainer = document.getElementById('qrcode');
+      const downloadBtn = document.getElementById('download-btn');
+      const resetBtn = document.getElementById('reset-btn');
+
+      let currentQR = null;
+      let currentText = '';
+      let qrCanvas = null;
+
+      function clearQR() {
+        if (currentQR) {
+          qrContainer.innerHTML = '<div class="qr-placeholder">⬡ QR code apparaîtra ici</div>';
+          currentQR = null;
+          qrCanvas = null;
+          currentText = '';
+        } else {
+          qrContainer.innerHTML = '<div class="qr-placeholder">⬡ QR code apparaîtra ici</div>';
+        }
+      }
+
+      function generateQR(text) {
+        if (!text || text.trim() === '') {
+          clearQR();
+          qrContainer.innerHTML = '<div class="qr-placeholder">⚠️ Veuillez entrer du texte</div>';
+          return false;
+        }
+
+        clearQR();
+
+        try {
+          currentQR = new QRCode(qrContainer, {
+            text: text,
+            width: 200,
+            height: 200,
+            colorDark: '#0f172a',
+            colorLight: '#ffffff',
+            correctLevel: QRCode.CorrectLevel.H
+          });
+
+          const canvas = qrContainer.querySelector('canvas');
+          const img = qrContainer.querySelector('img');
+          
+          if (canvas) {
+            qrCanvas = canvas;
+          } else if (img) {
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = img.naturalWidth || 200;
+            tempCanvas.height = img.naturalHeight || 200;
+            const ctx = tempCanvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, tempCanvas.width, tempCanvas.height);
+            qrCanvas = tempCanvas;
+          } else {
+            qrCanvas = null;
+          }
+
+          currentText = text;
+          return true;
+        } catch (error) {
+          console.warn('Erreur génération QR:', error);
+          qrContainer.innerHTML = '<div class="qr-placeholder" style="color:#f87171;">❌ Erreur · vérifiez le contenu</div>';
+          currentQR = null;
+          qrCanvas = null;
+          currentText = '';
+          return false;
+        }
+      }
+
+      // Événements
+      generateBtn.addEventListener('click', function() {
+        const value = textInput.value.trim();
+        if (value === '') {
+          clearQR();
+          qrContainer.innerHTML = '<div class="qr-placeholder">⚠️ Champ vide</div>';
+          return;
+        }
+        generateQR(value);
+      });
+
+      textInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          generateBtn.click();
+        }
+      });
+
+      resetBtn.addEventListener('click', function() {
+        clearQR();
+        textInput.value = '';
+        textInput.focus();
+      });
+
+      downloadBtn.addEventListener('click', function() {
+        const canvas = qrCanvas || qrContainer.querySelector('canvas');
+        if (!canvas) {
+          alert('Aucun QR code à télécharger. Générez-en un d\'abord.');
+          return;
+        }
+
+        try {
+          const link = document.createElement('a');
+          link.download = `xnow_qr_${Date.now()}.png`;
+          link.href = canvas.toDataURL('image/png');
+          link.click();
+        } catch (err) {
+          alert('Impossible de télécharger le QR code.');
+          console.error(err);
+        }
+      });
+
+      // Initialisation
+      const defaultText = textInput.value.trim() || 'https://xnow-qr.com';
+      if (defaultText) {
+        generateQR(defaultText);
+      } else {
+        clearQR();
+      }
+    })();
+    <!-- Dans la balise .brand-icon -->
+    <div class="brand-icon">X</div>  <!-- Remplacez "X" par votre symbole -->
+  </script>
+</body>
+</html>
